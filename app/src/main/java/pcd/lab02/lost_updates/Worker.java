@@ -15,7 +15,9 @@ public class Worker extends Thread {
 	public void run(){
 		log("started");
 		for (int i = 0; i < ntimes; i++){
-			counter.inc();
+			synchronized (counter) {
+				counter.inc();
+			}
 		}
 		log("completed");
 	}

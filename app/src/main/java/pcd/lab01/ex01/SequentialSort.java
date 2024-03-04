@@ -6,17 +6,15 @@ public class SequentialSort {
 
 	static final int VECTOR_SIZE = 400000000;
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 	
 		log("Generating array...");
 		long[] v = genArray(VECTOR_SIZE);
-
-		log("Array generated.");
-		log("Sorting (" + VECTOR_SIZE + " elements)...");
-
-		long t0 = System.nanoTime();
-
 		long[] sortedV = Arrays.copyOfRange(v, 0, v.length);
+		log("Array generated.");
+		
+		log("Sorting (" + VECTOR_SIZE + " elements)...");
+		long t0 = System.nanoTime();
 		Arrays.sort(sortedV, 0, sortedV.length);
 		long t1 = System.nanoTime();
 		log("Done. Time elapsed: " + ((t1 - t0) / 1000000) + " ms");

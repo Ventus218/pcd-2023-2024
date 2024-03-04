@@ -9,8 +9,8 @@ public class SequentialSort {
 	public static void main(String[] args) throws InterruptedException {
 	
 		log("Generating array...");
-		long[] v = genArray(VECTOR_SIZE);
-		long[] sortedV = Arrays.copyOfRange(v, 0, v.length);
+		int[] v = genArray(VECTOR_SIZE);
+		int[] sortedV = Arrays.copyOfRange(v, 0, v.length);
 		log("Array generated.");
 		
 		log("Sorting (" + VECTOR_SIZE + " elements)...");
@@ -22,10 +22,10 @@ public class SequentialSort {
 		log("Sorting (" + VECTOR_SIZE + " elements)...");
 
 		t0 = System.nanoTime();
-		var nProcessors = Runtime.getRuntime().availableProcessors() - 1;
+		var nProcessors = Runtime.getRuntime().availableProcessors();
 
 		List<Thread> threads = new ArrayList<>();
-		Map<Integer, Integer> itemsPerThread = new HashMap<>();
+		int[] itemsPerThread = new int[nProcessors];
 
 		for (int i = 0; i < nProcessors; i++) {
 			var proc = i;
@@ -34,7 +34,7 @@ public class SequentialSort {
 				int start = nItems * proc;
 				int end = Math.min(start + nItems, v.length);
 
-				itemsPerThread.put(proc, end - start);
+				itemsPerThread[proc] = end - start;
 
 				Arrays.sort(v, start, end);
 			});
@@ -46,13 +46,13 @@ public class SequentialSort {
 			th.join();
 		}
 
-		long mySortedV[] = new long[v.length];
+		int mySortedV[] = new int[v.length];
 
 		for (int i = 0; i < v.length; i++) {
-			Long min = Long.MAX_VALUE;
+			var min = Integer.MAX_VALUE;
 			int minThreadIndex = 0;
-			for (Integer threadIndex : itemsPerThread.keySet()) {
-				var remainingItems = itemsPerThread.get(threadIndex);
+			for (int threadIndex = 0; threadIndex < nProcessors; threadIndex++) {
+				var remainingItems = itemsPerThread[threadIndex];
 				if (remainingItems > 0) {
 					var nItems = (v.length + nProcessors) / nProcessors;
 					int start = nItems * threadIndex;
@@ -63,7 +63,7 @@ public class SequentialSort {
 					}
 				}
 			}
-			itemsPerThread.replace(minThreadIndex, itemsPerThread.get(minThreadIndex) - 1);
+			itemsPerThread[minThreadIndex] = itemsPerThread[minThreadIndex] - 1;
 			mySortedV[i] = min;
 		}
 
@@ -75,18 +75,13 @@ public class SequentialSort {
 		} else {
 			System.err.println("Array was not sorted correcly");
 		}
-		
-		// dumpArray(sortedV);
-		// System.out.println();
-		// System.out.println();
-		// dumpArray(mySortedV);
 	}
 
-	private static long[] genArray(int n) {
+	private static int[] genArray(int n) {
 		Random gen = new Random(System.currentTimeMillis());
-		long v[] = new long[n];
+		int v[] = new int[n];
 		for (int i = 0; i < v.length; i++) {
-			v[i] = gen.nextLong();
+			v[i] = gen.nextInt();
 		}
 		return v;
 	}

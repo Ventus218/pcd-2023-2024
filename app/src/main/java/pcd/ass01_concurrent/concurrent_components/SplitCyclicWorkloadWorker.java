@@ -1,18 +1,18 @@
 package pcd.ass01_concurrent.concurrent_components;
 
-public class SplitLoadWorker extends Thread {
+public class SplitCyclicWorkloadWorker extends Thread {
 
     private CyclicWorkload cyclicWorkload;
     private SelfResettingBarrier barrier;
     private boolean shouldStop = false;
 
-    public SplitLoadWorker(CyclicWorkload cyclicWorkload, SelfResettingBarrier barrier) {
+    public SplitCyclicWorkloadWorker(CyclicWorkload cyclicWorkload, SelfResettingBarrier barrier) {
         super();
         this.cyclicWorkload = cyclicWorkload;
         this.barrier = barrier;
     }
 
-    public SplitLoadWorker(CyclicWorkload cyclicWorkload, SelfResettingBarrier barrier, String threadName) {
+    public SplitCyclicWorkloadWorker(CyclicWorkload cyclicWorkload, SelfResettingBarrier barrier, String threadName) {
         super(threadName);
         this.cyclicWorkload = cyclicWorkload;
         this.barrier = barrier;

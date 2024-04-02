@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import pcd.ass01_concurrent.concurrent_components.SelfResettingBarrier;
-import pcd.ass01_concurrent.concurrent_components.SplitCyclicLoadMaster;
-import pcd.ass01_concurrent.concurrent_components.SplitLoadWorker;
+import pcd.ass01_concurrent.concurrent_components.SplitCyclicWorkloadMaster;
 
 /**
  * Base class for defining concrete simulations
@@ -75,7 +73,7 @@ public abstract class AbstractSimulation {
 		long timePerStep = 0;
 		int nSteps = 0;
 
-		final SplitCyclicLoadMaster master = new SplitCyclicLoadMaster(Optional.of(agents.size()), Optional.empty());
+		final SplitCyclicWorkloadMaster master = new SplitCyclicWorkloadMaster(Optional.of(agents.size()), Optional.empty());
 		while (nSteps < numSteps) {
 
 			currentWallTime = System.currentTimeMillis();

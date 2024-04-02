@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class SplitCyclicLoadMaster {
+public class SplitCyclicWorkloadMaster {
     private final CyclicWorkload cyclicWorkload = new CyclicWorkload();
     private final SelfResettingBarrier barrier;
-    private final List<SplitLoadWorker> splitLoadWorkers;
+    private final List<SplitCyclicWorkloadWorker> splitLoadWorkers;
 
-    public SplitCyclicLoadMaster(Optional<Integer> expectedNumberOfTasksPerCycle, Optional<Integer> numberOfWorkers) {
+    public SplitCyclicWorkloadMaster(Optional<Integer> expectedNumberOfTasksPerCycle, Optional<Integer> numberOfWorkers) {
 
         final int nWorkers;
         if (numberOfWorkers.isPresent()) {
@@ -23,7 +23,7 @@ public class SplitCyclicLoadMaster {
         splitLoadWorkers = new ArrayList<>();
 
         for (int i = 0; i < nWorkers; i++) {
-            SplitLoadWorker worker = new SplitLoadWorker(cyclicWorkload, barrier, "Worker " + i);
+            SplitCyclicWorkloadWorker worker = new SplitCyclicWorkloadWorker(cyclicWorkload, barrier, "Worker " + i);
             splitLoadWorkers.add(worker);
             worker.start();
         }

@@ -2,10 +2,11 @@ package pcd.ass01_concurrent.simengineseq_improved;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import pcd.ass01_concurrent.concurrent_components.SelfResettingBarrier;
+import pcd.ass01_concurrent.concurrent_components.SplitCyclicLoadMaster;
 import pcd.ass01_concurrent.concurrent_components.SplitLoadWorker;
-import pcd.ass01_concurrent.concurrent_components.TaskQueue;
 
 /**
  * Base class for defining concrete simulations
@@ -74,21 +75,7 @@ public abstract class AbstractSimulation {
 		long timePerStep = 0;
 		int nSteps = 0;
 
-		final int numberOfWorkers = 8;
-		SelfResettingBarrier barrier = new SelfResettingBarrier(numberOfWorkers + 1); // Main thread will wait at the barrier too
-		List<TaskQueue> taskQueues = new ArrayList<>();
-		List<SplitLoadWorker> splitLoadWorkers = new ArrayList<>();
-
-		for (int i = 0; i < numberOfWorkers; i++) {
-			TaskQueue taskQueue = new TaskQueue();
-			taskQueues.add(taskQueue);
-			SplitLoadWorker worker = new SplitLoadWorker(taskQueue, barrier, "Worker " + i);
-			splitLoadWorkers.add(worker);
-			worker.start(); // The worker will start and wait for new tasks in the queue
-		}
-		
-		var numberOfAgentsForWorker = (agents.size() + numberOfWorkers - 1) / (numberOfWorkers);
-
+		final SplitCyclicLoadMaster master = new SplitCyclicLoadMaster(Optional.of(agents.size()), Optional.empty());
 		while (nSteps < numSteps) {
 
 			currentWallTime = System.currentTimeMillis();
@@ -102,22 +89,17 @@ public abstract class AbstractSimulation {
 			env.cleanActions();
 
 			/* ask each agent to make a step */
-
-			for (int i = 0; i < numberOfWorkers; i++) {
-				var startIndex = i * numberOfAgentsForWorker;
-				var endIndex = Math.min(startIndex + numberOfAgentsForWorker, agents.size());
-				taskQueues.get(i).enqueueTask(() -> {
-					for (int j = startIndex; j < endIndex; j++) {
-						agents.get(j).step(dt);
-					}
+			List<Runnable> tasks = new ArrayList<>();
+			for (var a : agents) {
+				tasks.add(() -> {
+					a.step(dt);
 				});
 			}
-
 			try {
-				barrier.waitForOthers();
+				master.executeWorkload(tasks);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-				stopWorkers(splitLoadWorkers);
+				master.workFinished();
 				System.exit(1);
 			}
 
@@ -137,17 +119,11 @@ public abstract class AbstractSimulation {
 			}
 		}
 
-		stopWorkers(splitLoadWorkers);
+		master.workFinished();
 
 		endWallTime = System.currentTimeMillis();
 		this.averageTimePerStep = timePerStep / numSteps;
 
-	}
-
-	private void stopWorkers(List<SplitLoadWorker> splitLoadWorkers) {
-		for (SplitLoadWorker splitLoadWorker : splitLoadWorkers) {
-			splitLoadWorker.beginStopping();
-		}
 	}
 
 	public long getSimulationDuration() {

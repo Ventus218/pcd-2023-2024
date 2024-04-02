@@ -2,19 +2,19 @@ package pcd.ass01_concurrent.concurrent_components;
 
 public class SplitLoadWorker extends Thread {
 
-    private TaskQueue taskQueue;
+    private CyclicWorkload cyclicWorkload;
     private SelfResettingBarrier barrier;
     private boolean shouldStop = false;
 
-    public SplitLoadWorker(TaskQueue taskQueue, SelfResettingBarrier barrier) {
+    public SplitLoadWorker(CyclicWorkload cyclicWorkload, SelfResettingBarrier barrier) {
         super();
-        this.taskQueue = taskQueue;
+        this.cyclicWorkload = cyclicWorkload;
         this.barrier = barrier;
     }
-    
-    public SplitLoadWorker(TaskQueue taskQueue, SelfResettingBarrier barrier, String threadName) {
+
+    public SplitLoadWorker(CyclicWorkload cyclicWorkload, SelfResettingBarrier barrier, String threadName) {
         super(threadName);
-        this.taskQueue = taskQueue;
+        this.cyclicWorkload = cyclicWorkload;
         this.barrier = barrier;
     }
 
@@ -23,26 +23,28 @@ public class SplitLoadWorker extends Thread {
         super.run();
 
         while (!shouldStop()) {
-            Runnable task = null;
             try {
-                task = taskQueue.dequeueTask();
-            } catch (InterruptedException e) {
-                // This enables to interrupt the thread for checking if should stop
-            }
-            
-            if (task != null) {
-                task.run();
+                cyclicWorkload.waitForWorkload();
+                Runnable task = null;
+                while ((task = cyclicWorkload.nextTask()) != null) {
+                    task.run();
+                }
+
                 try {
                     barrier.waitForOthers();
                 } catch (InterruptedException e) {
-                    System.err.println("WARNING:\n Worker thread interrupted while waiting on a barrier.\nThis means that it may be stopped while other worker threads are still running.");
+                    System.err.println(
+                            "WARNING:\n Worker thread interrupted while waiting on a barrier.\nThis means that it may be stopped while other worker threads are still running.");
                 }
+            } catch (InterruptedException e) {
+                // This enables to interrupt the thread for checking if should stop
             }
-            
         }
     }
 
-    private synchronized boolean shouldStop() { return shouldStop; }
+    private synchronized boolean shouldStop() {
+        return shouldStop;
+    }
 
     public synchronized void beginStopping() {
         if (shouldStop == true) {

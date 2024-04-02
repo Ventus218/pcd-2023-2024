@@ -51,7 +51,7 @@ public abstract class AbstractEnvironment {
 	 * 
 	 * @param act - the action
 	 */
-	public void submitAction(Action act) {
+	public synchronized void submitAction(Action act) {
 		submittedActions.add(act);
 	}
 	

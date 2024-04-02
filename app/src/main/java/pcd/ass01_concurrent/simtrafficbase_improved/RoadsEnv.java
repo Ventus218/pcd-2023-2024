@@ -97,7 +97,7 @@ public class RoadsEnv extends AbstractEnvironment {
 	
 	@Override
 	public void processActions() {
-		for (var act: submittedActions) {
+		for (var act: submittedActions()) {
 			switch (act) {
 			case MoveForward mv: {
 				CarAgentInfo info = registeredCars.get(mv.agentId());

@@ -1,6 +1,7 @@
 package pcd.ass01_concurrent.simengineseq_improved;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -11,7 +12,7 @@ import java.util.List;
 public abstract class AbstractEnvironment {
 
 	private String id;
-	protected List<Action> submittedActions;
+	private List<Action> submittedActions;
 
 	protected AbstractEnvironment(String id) {
 		this.id = id;		
@@ -53,6 +54,10 @@ public abstract class AbstractEnvironment {
 	 */
 	public synchronized void submitAction(Action act) {
 		submittedActions.add(act);
+	}
+
+	public synchronized List<Action> submittedActions() {
+		return Collections.unmodifiableList(submittedActions);
 	}
 	
 	/**

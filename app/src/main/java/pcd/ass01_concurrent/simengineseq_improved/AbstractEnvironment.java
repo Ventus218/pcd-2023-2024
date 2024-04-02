@@ -61,7 +61,7 @@ public abstract class AbstractEnvironment {
 	 * submitted by agents
 	 * 
 	 */
-	public void cleanActions() {
+	public synchronized void cleanActions() {
 		submittedActions.clear();
 	}
 

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import pcd.ass01_concurrent.concurrent_components.SimulationEarlyStopper;
+import pcd.ass01_concurrent.concurrent_components.SimulationPauser;
 import pcd.ass01_concurrent.concurrent_components.SplitCyclicWorkloadMaster;
 
 /**
@@ -20,6 +22,9 @@ public abstract class AbstractSimulation {
 
 	/* simulation listeners */
 	private List<SimulationListener> listeners;
+
+	private Optional<SimulationEarlyStopper> earlyStopper = Optional.empty();
+	private Optional<SimulationPauser> pauser = Optional.empty();
 
 	/* logical time step */
 	private int dt;
@@ -50,6 +55,14 @@ public abstract class AbstractSimulation {
 	 */
 	protected abstract void setup();
 
+	public void setEarlyStopper(SimulationEarlyStopper earlyStopper) {
+		this.earlyStopper = Optional.ofNullable(earlyStopper);
+	}
+
+	public void setPauser(SimulationPauser pauser) {
+		this.pauser = Optional.ofNullable(pauser);
+	}
+
 	/**
 	 * Method running the simulation for a number of steps,
 	 * using a sequential approach
@@ -74,7 +87,16 @@ public abstract class AbstractSimulation {
 		int nSteps = 0;
 
 		final SplitCyclicWorkloadMaster master = new SplitCyclicWorkloadMaster(Optional.of(agents.size()), Optional.empty());
-		while (nSteps < numSteps) {
+		
+		boolean hasStopper = earlyStopper.isPresent();
+		while (nSteps < numSteps && (!hasStopper || !earlyStopper.get().shouldStopSimulation())) {
+			if (pauser.isPresent()) {
+				try {
+					pauser.get().waitWhilePaused();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 
 			currentWallTime = System.currentTimeMillis();
 

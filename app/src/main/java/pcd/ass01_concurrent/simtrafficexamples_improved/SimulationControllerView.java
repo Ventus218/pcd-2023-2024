@@ -9,51 +9,80 @@ import javax.swing.event.ChangeListener;
 
 public class SimulationControllerView extends JFrame {
 
-    public SimulationControllerView(int defaultStepNumber) {
+    private int stepNumber;
+    private boolean isPaused = false;
+    private final JButton pauseButton;
+
+    public SimulationControllerView(int defaultStepNumber, SimulationControllerDelegate delegate) {
         super("Simulation Controller View");
-        setSize(200, 120);
-        JPanel cp = new JPanel();
+        var thisView = this;
+        stepNumber = defaultStepNumber;
+
+        setSize(280, 120);
+
+        JLabel stepLabel = new JLabel();
+        setStepLabel(stepLabel, stepNumber);
+
+        JSlider stepSlider = new JSlider(1, 10000, stepNumber);
+        stepSlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                stepNumber = stepSlider.getValue();
+                setStepLabel(stepLabel, stepNumber);
+            }
+        });
+
+        pauseButton = new JButton("Pause");
+        pauseButton.setEnabled(false);
+        pauseButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (isPaused) {
+                    delegate.onUnpauseSimulation(thisView);
+                } else {
+                    delegate.onPauseSimulation(thisView);
+                }
+                isPaused = !isPaused;
+                pauseButton.setText(isPaused ? "Unpause" : "Pause");
+            }
+        });
+        
+        JButton stopButton = new JButton("Stop");
+        stopButton.setEnabled(false);
+        stopButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                stopButton.setEnabled(false);
+                pauseButton.setEnabled(false);
+                delegate.onStopSimulation(thisView);
+            }
+        });
 
         JButton startButton = new JButton("Start");
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Start!");
+                stepSlider.setEnabled(false);
+                startButton.setEnabled(false);
+                stopButton.setEnabled(true);
+                pauseButton.setEnabled(true);
+                delegate.onStartSimulation(thisView, stepNumber);
             }
         });
-        cp.add(startButton);
-
-        JButton stopButton = new JButton("Stop");
-        stopButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Stop!");
-            }
-        });
-        cp.add(stopButton);
-
+        
         JPanel sliderContainer = new JPanel();
         sliderContainer.setLayout(new BoxLayout(sliderContainer, BoxLayout.Y_AXIS));
-
-        JLabel stepLabel = new JLabel();
-        setStepLabel(stepLabel, defaultStepNumber);
         sliderContainer.add(stepLabel);
-
-        JSlider stepSlider = new JSlider(1, 10000, defaultStepNumber);
-        stepSlider.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                setStepLabel(stepLabel, stepSlider.getValue());
-            }
-        });
         sliderContainer.add(stepSlider);
-
+        
+        JPanel cp = new JPanel();
+        cp.add(startButton);
+        cp.add(stopButton);
+        cp.add(pauseButton);
         cp.add(sliderContainer);
-
         setContentPane(cp);
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-
     }
 
     private void setStepLabel(JLabel label, int steps) {
@@ -63,6 +92,19 @@ public class SimulationControllerView extends JFrame {
     public void display() {
         SwingUtilities.invokeLater(() -> {
             this.setVisible(true);
+        });
+    }
+
+    public void close() {
+        SwingUtilities.invokeLater(() -> {
+            this.setVisible(false);
+            this.dispose();
+        });
+    }
+
+    public void disablePauseButton() {
+        SwingUtilities.invokeLater(() -> {
+            this.pauseButton.setEnabled(false);
         });
     }
 }

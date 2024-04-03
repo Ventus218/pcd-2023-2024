@@ -1,10 +1,7 @@
 package pcd.ass01_concurrent.simtrafficexamples_improved;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.util.List;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+
 import pcd.ass01_concurrent.simengineseq_improved.*;
 import pcd.ass01_concurrent.simtrafficbase_improved.*;
 
@@ -38,6 +35,13 @@ public class RoadSimView extends JFrame implements SimulationListener {
 			this.setVisible(true);
 		});
 	}
+
+	public void close() {
+        SwingUtilities.invokeLater(() -> {
+            this.setVisible(false);
+            this.dispose();
+        });
+    }
 
 	@Override
 	public void notifyInit(int t, List<AbstractAgent> agents, AbstractEnvironment env) {

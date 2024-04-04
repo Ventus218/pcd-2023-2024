@@ -1,23 +1,26 @@
 package pcd.ass01_concurrent.concurrent_components;
 
-import java.util.Optional;
+import java.util.Queue;
 
 public class SplitCyclicWorkloadWorker extends Thread {
 
-    private CyclicWorkload cyclicWorkload;
-    private SelfResettingBarrier barrier;
+    private Queue<Runnable> tasksQueue;
+    private SelfResettingBarrier startCycleBarrier;
+    private SelfResettingBarrier endCycleBarrier;
     private boolean shouldStop = false;
 
-    public SplitCyclicWorkloadWorker(CyclicWorkload cyclicWorkload, SelfResettingBarrier barrier) {
+    public SplitCyclicWorkloadWorker(Queue<Runnable> tasksQueue, SelfResettingBarrier startCycleBarrier, SelfResettingBarrier endCycleBarrier) {
         super();
-        this.cyclicWorkload = cyclicWorkload;
-        this.barrier = barrier;
+        this.startCycleBarrier = startCycleBarrier;
+        this.tasksQueue = tasksQueue;
+        this.endCycleBarrier = endCycleBarrier;
     }
-
-    public SplitCyclicWorkloadWorker(CyclicWorkload cyclicWorkload, SelfResettingBarrier barrier, String threadName) {
+    
+    public SplitCyclicWorkloadWorker(Queue<Runnable> tasksQueue, SelfResettingBarrier startCycleBarrier, SelfResettingBarrier endCycleBarrier, String threadName) {
         super(threadName);
-        this.cyclicWorkload = cyclicWorkload;
-        this.barrier = barrier;
+        this.startCycleBarrier = startCycleBarrier;
+        this.tasksQueue = tasksQueue;
+        this.endCycleBarrier = endCycleBarrier;
     }
 
     @Override
@@ -26,14 +29,15 @@ public class SplitCyclicWorkloadWorker extends Thread {
 
         while (!shouldStop()) {
             try {
-                cyclicWorkload.waitForWorkload();
-                Optional<Runnable> task = null;
-                while ((task = cyclicWorkload.nextTask()).isPresent()) {
-                    task.get().run();
+                startCycleBarrier.waitForOthers();
+
+                Runnable task = null;
+                while ((task = tasksQueue.poll()) != null) {
+                    task.run();
                 }
 
                 try {
-                    barrier.waitForOthers();
+                    endCycleBarrier.waitForOthers();
                 } catch (InterruptedException e) {
                     System.err.println(
                             "WARNING:\n Worker thread interrupted while waiting on a barrier.\nThis means that it may be stopped while other worker threads are still running.");

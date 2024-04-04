@@ -3,10 +3,13 @@ package pcd.ass01_concurrent.concurrent_components;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SplitCyclicWorkloadMaster {
-    private final CyclicWorkload cyclicWorkload = new CyclicWorkload();
-    private final SelfResettingBarrier barrier;
+    private final Queue<Runnable> taskQueue = new ConcurrentLinkedQueue<>();
+    private final SelfResettingBarrier startCycleBarrier;
+    private final SelfResettingBarrier endCycleBarrier;
     private final List<SplitCyclicWorkloadWorker> splitLoadWorkers;
 
     public SplitCyclicWorkloadMaster(Optional<Integer> expectedNumberOfTasksPerCycle, Optional<Integer> numberOfWorkers) {
@@ -19,19 +22,21 @@ public class SplitCyclicWorkloadMaster {
             nWorkers = Math.min(processors, expectedNumberOfTasksPerCycle.orElse(processors));
         }
 
-        barrier = new SelfResettingBarrier(nWorkers + 1); // Master thread will wait at the barrier too
+        startCycleBarrier = new SelfResettingBarrier(nWorkers + 1); // Master thread will wait at the barrier too
+        endCycleBarrier = new SelfResettingBarrier(nWorkers + 1); // Master thread will wait at the barrier too
         splitLoadWorkers = new ArrayList<>();
 
         for (int i = 0; i < nWorkers; i++) {
-            SplitCyclicWorkloadWorker worker = new SplitCyclicWorkloadWorker(cyclicWorkload, barrier, "Worker " + i);
+            SplitCyclicWorkloadWorker worker = new SplitCyclicWorkloadWorker(taskQueue, startCycleBarrier, endCycleBarrier, "Worker " + i);
             splitLoadWorkers.add(worker);
             worker.start();
         }
     }
 
     public void executeWorkload(List<Runnable> tasks) throws InterruptedException {
-        cyclicWorkload.assignWorkload(tasks);
-        barrier.waitForOthers();
+        taskQueue.addAll(tasks);
+        startCycleBarrier.waitForOthers();
+        endCycleBarrier.waitForOthers();
     }
 
     public void workFinished() {

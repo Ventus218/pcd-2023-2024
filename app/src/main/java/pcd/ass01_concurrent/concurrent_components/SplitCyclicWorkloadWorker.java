@@ -1,5 +1,7 @@
 package pcd.ass01_concurrent.concurrent_components;
 
+import java.util.Optional;
+
 public class SplitCyclicWorkloadWorker extends Thread {
 
     private CyclicWorkload cyclicWorkload;
@@ -25,9 +27,9 @@ public class SplitCyclicWorkloadWorker extends Thread {
         while (!shouldStop()) {
             try {
                 cyclicWorkload.waitForWorkload();
-                Runnable task = null;
-                while ((task = cyclicWorkload.nextTask()) != null) {
-                    task.run();
+                Optional<Runnable> task = null;
+                while ((task = cyclicWorkload.nextTask()).isPresent()) {
+                    task.get().run();
                 }
 
                 try {

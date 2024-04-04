@@ -2,6 +2,7 @@ package pcd.ass01_concurrent.concurrent_components;
 
 import java.util.Collection;
 import java.util.Queue;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -24,14 +25,14 @@ public class CyclicWorkload {
         }
     }
 
-    public Runnable nextTask() {
+    public Optional<Runnable> nextTask() throws InterruptedException {
         try {
             mutex.lock();
             var task = taskQueue.poll();
             if (taskQueue.isEmpty()) {
                 workloadIsReady = false;
             }
-            return task;
+            return Optional.ofNullable(task);
         } finally {
             mutex.unlock();
         }
@@ -40,7 +41,10 @@ public class CyclicWorkload {
     public void waitForWorkload() throws InterruptedException {
         try {
             mutex.lock();
-            while (!workloadIsReady) {
+            // While on await is not needed in this specific case
+            // as we want the thread to skip this cycle if he
+            // wasn't able to get any task
+            if (!workloadIsReady) {
                 condition.await();
             }
         } finally {

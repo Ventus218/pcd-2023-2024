@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import pcd.ass01_concurrent.simengineseq_improved.*;
 
@@ -130,7 +131,7 @@ public class RoadsEnv extends AbstractEnvironment {
 	
 	
 	public List<CarAgentInfo> getAgentInfo(){
-		return this.registeredCars.entrySet().stream().map(el -> el.getValue()).toList();
+		return this.registeredCars.entrySet().stream().map(el -> el.getValue()).collect(Collectors.toList());
 	}
 
 	public List<Road> getRoads(){

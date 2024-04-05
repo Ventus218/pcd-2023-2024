@@ -13,4 +13,20 @@ import pcd.ass01_concurrent.simengineseq_improved.Percept;
  * - nearest semaphore, if present (distance)
  * 
  */
-public record CarPercept(double roadPos, Optional<CarAgentInfo> nearestCarInFront, Optional<TrafficLightInfo> nearestSem) implements Percept { }
+public class CarPercept implements Percept {
+    double roadPos;
+    Optional<CarAgentInfo> nearestCarInFront;
+    Optional<TrafficLightInfo> nearestSem;
+
+    public double roadPos() {
+        return roadPos;
+    }
+
+    public Optional<CarAgentInfo> nearestCarInFront() {
+        return nearestCarInFront;
+    }
+
+    public Optional<TrafficLightInfo> nearestSem() {
+        return nearestSem;
+    }
+}

@@ -33,14 +33,14 @@ public class RoadsEnv extends AbstractEnvironment {
 	
 	@Override
 	public void init() {
-		for (var tl: trafficLights) {
+		for (TrafficLight tl: trafficLights) {
 			tl.init();
 		}
 	}
 	
 	@Override
 	public void step(int dt) {
-		for (var tl: trafficLights) {
+		for (TrafficLight tl: trafficLights) {
 			tl.step(dt);
 		}
 	}
@@ -98,9 +98,9 @@ public class RoadsEnv extends AbstractEnvironment {
 	
 	@Override
 	public void processActions() {
-		for (var act: submittedActions) {
-			switch (act) {
-			case MoveForward mv: {
+		for (Action act: submittedActions) {
+			if (act instanceof MoveForward) { 
+				MoveForward mv = (MoveForward) act;
 				CarAgentInfo info = registeredCars.get(mv.agentId());
 				Road road = info.getRoad();
 				Optional<CarAgentInfo> nearestCar = getNearestCarInFront(road, info.getPos(), CAR_DETECTION_RANGE);
@@ -117,9 +117,6 @@ public class RoadsEnv extends AbstractEnvironment {
 				if (info.getPos() > road.getLen()) {
 					info.updatePos(0);
 				}
-				break;
-			}
-			default: break;
 			}
 		}
 	}

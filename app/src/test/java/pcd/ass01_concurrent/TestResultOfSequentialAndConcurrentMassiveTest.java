@@ -18,7 +18,7 @@ public class TestResultOfSequentialAndConcurrentMassiveTest {
 
     @Test void test() {
 		
-		var sequentialSimulation = new pcd.ass01.simtrafficexamples_improved.TrafficSimulationSingleRoadMassiveNumberOfCars(NUMBER_OF_CARS);
+		pcd.ass01.simtrafficexamples_improved.TrafficSimulationSingleRoadMassiveNumberOfCars sequentialSimulation = new pcd.ass01.simtrafficexamples_improved.TrafficSimulationSingleRoadMassiveNumberOfCars(NUMBER_OF_CARS);
 		sequentialSimulation.setup();
         sequentialSimulation.addSimulationListener(new pcd.ass01.simtrafficexamples_improved.RoadSimStatistics());
 
@@ -30,7 +30,7 @@ public class TestResultOfSequentialAndConcurrentMassiveTest {
         System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.out)));
 
 
-        var concurrentSimulation = new TrafficSimulationSingleRoadMassiveNumberOfCars(NUMBER_OF_CARS);
+        TrafficSimulationSingleRoadMassiveNumberOfCars concurrentSimulation = new TrafficSimulationSingleRoadMassiveNumberOfCars(NUMBER_OF_CARS);
 		concurrentSimulation.setup();
         concurrentSimulation.addSimulationListener(new RoadSimStatistics());
 

@@ -18,6 +18,12 @@ public class CarPercept implements Percept {
     Optional<CarAgentInfo> nearestCarInFront;
     Optional<TrafficLightInfo> nearestSem;
 
+    public CarPercept(double roadPos, Optional<CarAgentInfo> nearestCarInFront, Optional<TrafficLightInfo> nearestSem) {
+        this.roadPos = roadPos;
+        this.nearestCarInFront = nearestCarInFront;
+        this.nearestSem = nearestSem;
+    }
+
     public double roadPos() {
         return roadPos;
     }

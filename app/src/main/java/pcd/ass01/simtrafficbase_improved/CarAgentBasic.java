@@ -90,7 +90,7 @@ public class CarAgentBasic extends CarAgent {
 		
 	private boolean detectedNearCar() {
 		Optional<CarAgentInfo> car = currentPercept.nearestCarInFront();
-		if (car.isEmpty()) {
+		if (!car.isPresent()) {
 			return false;
 		} else {
 			double dist = car.get().getPos() - currentPercept.roadPos();
@@ -101,7 +101,7 @@ public class CarAgentBasic extends CarAgent {
 
 	private boolean carFarEnough() {
 		Optional<CarAgentInfo> car = currentPercept.nearestCarInFront();
-		if (car.isEmpty()) {
+		if (!car.isPresent()) {
 			return true;
 		} else {
 			double dist = car.get().getPos() - currentPercept.roadPos();

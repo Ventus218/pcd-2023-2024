@@ -104,7 +104,7 @@ public class RoadsEnv extends AbstractEnvironment {
 				Road road = info.getRoad();
 				Optional<CarAgentInfo> nearestCar = getNearestCarInFront(road, info.getPos(), CAR_DETECTION_RANGE);
 				
-				if (!nearestCar.isEmpty()) {
+				if (nearestCar.isPresent()) {
 					double dist = nearestCar.get().getPos() - info.getPos();
 					if (dist > mv.distance() + MIN_DIST_ALLOWED) {
 						info.updatePos(info.getPos() + mv.distance());

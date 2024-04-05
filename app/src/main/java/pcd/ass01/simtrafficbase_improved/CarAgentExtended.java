@@ -102,7 +102,7 @@ public class CarAgentExtended extends CarAgent {
 		
 	private boolean detectedNearCar() {
 		Optional<CarAgentInfo> car = currentPercept.nearestCarInFront();
-		if (car.isEmpty()) {
+		if (!car.isPresent()) {
 			return false;
 		} else {
 			double dist = car.get().getPos() - currentPercept.roadPos();
@@ -112,7 +112,7 @@ public class CarAgentExtended extends CarAgent {
 	
 	private boolean detectedRedOrOrgangeSemNear() {
 		Optional<TrafficLightInfo> sem = currentPercept.nearestSem();
-		if (sem.isEmpty() || sem.get().sem().isGreen()) {
+		if (!sem.isPresent() || sem.get().sem().isGreen()) {
 			return false;
 		} else {
 			double dist = sem.get().roadPos() - currentPercept.roadPos();
@@ -123,12 +123,12 @@ public class CarAgentExtended extends CarAgent {
 
 	private boolean detectedGreenSem() {
 		Optional<TrafficLightInfo> sem = currentPercept.nearestSem();
-		return (!sem.isEmpty() && sem.get().sem().isGreen());
+		return (sem.isPresent() && sem.get().sem().isGreen());
 	}
 	
 	private boolean carFarEnough() {
 		Optional<CarAgentInfo> car = currentPercept.nearestCarInFront();
-		if (car.isEmpty()) {
+		if (!car.isPresent()) {
 			return true;
 		} else {
 			double dist = car.get().getPos() - currentPercept.roadPos();

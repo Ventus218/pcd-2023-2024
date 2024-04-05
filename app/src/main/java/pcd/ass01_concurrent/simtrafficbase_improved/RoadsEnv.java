@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import pcd.ass01_concurrent.simengineseq_improved.*;
 
@@ -32,14 +34,14 @@ public class RoadsEnv extends AbstractEnvironment {
 	
 	@Override
 	public void init() {
-		for (var tl: trafficLights) {
+		for (TrafficLight tl: trafficLights) {
 			tl.init();
 		}
 	}
 	
 	@Override
 	public void step(int dt) {
-		for (var tl: trafficLights) {
+		for (TrafficLight tl: trafficLights) {
 			tl.step(dt);
 		}
 	}
@@ -73,38 +75,45 @@ public class RoadsEnv extends AbstractEnvironment {
 	}
 
 	private Optional<CarAgentInfo> getNearestCarInFront(Road road, double carPos, double range){
-		return 
-				registeredCars
-				.entrySet()
-				.stream()
-				.map(el -> el.getValue())
-				.filter((carInfo) -> carInfo.getRoad() == road)
-				.filter((carInfo) -> {
-					double dist = carInfo.getPos() - carPos;
-					return dist > 0 && dist <= range;
-				})
-				.min((c1, c2) -> (int) Math.round(c1.getPos() - c2.getPos()));
+		List<CarAgentInfo> carInfos = new ArrayList<>();
+		for (Entry<String, CarAgentInfo> entry : registeredCars.entrySet()) {
+			carInfos.add(entry.getValue());
+		}
+
+		List<CarAgentInfo> usefulCarInfos = new ArrayList<>();
+		for (CarAgentInfo carInfo : carInfos) {
+			double dist = carInfo.getPos() - carPos;
+			if ((dist > 0 && dist <= range) && (carInfo.getRoad() == road)) {
+				usefulCarInfos.add(carInfo);
+			}
+		}
+
+		return usefulCarInfos.stream().min((c1, c2) -> (int) Math.round(c1.getPos() - c2.getPos()));
 	}
 
 	private Optional<TrafficLightInfo> getNearestSemaphoreInFront(Road road, double carPos, double range){
-		return 
-				road.getTrafficLights()
-				.stream()
-				.filter((TrafficLightInfo tl) -> tl.roadPos() > carPos)
-				.min((c1, c2) -> (int) Math.round(c1.roadPos() - c2.roadPos()));
+		List<TrafficLightInfo> trafficLightInfos = new ArrayList<>(road.getTrafficLights());
+
+		List<TrafficLightInfo> usefulTrafficLightInfos = new ArrayList<>();
+		for (TrafficLightInfo trafficLightInfo : trafficLightInfos) {
+			if (trafficLightInfo.roadPos() > carPos) {
+				usefulTrafficLightInfos.add(trafficLightInfo);
+			}
+		}
+		return trafficLightInfos.stream().min((c1, c2) -> (int) Math.round(c1.roadPos() - c2.roadPos()));
 	}
 	
 	
 	@Override
 	public void processActions() {
-		for (var act: submittedActions()) {
-			switch (act) {
-			case MoveForward mv: {
+		for (Action act: submittedActions()) {
+			if (act instanceof MoveForward) { 
+				MoveForward mv = (MoveForward) act;
 				CarAgentInfo info = registeredCars.get(mv.agentId());
 				Road road = info.getRoad();
 				Optional<CarAgentInfo> nearestCar = getNearestCarInFront(road, info.getPos(), CAR_DETECTION_RANGE);
 				
-				if (!nearestCar.isEmpty()) {
+				if (nearestCar.isPresent()) {
 					double dist = nearestCar.get().getPos() - info.getPos();
 					if (dist > mv.distance() + MIN_DIST_ALLOWED) {
 						info.updatePos(info.getPos() + mv.distance());
@@ -116,16 +125,13 @@ public class RoadsEnv extends AbstractEnvironment {
 				if (info.getPos() > road.getLen()) {
 					info.updatePos(0);
 				}
-				break;
-			}
-			default: break;
 			}
 		}
 	}
 	
 	
 	public List<CarAgentInfo> getAgentInfo(){
-		return this.registeredCars.entrySet().stream().map(el -> el.getValue()).toList();
+		return this.registeredCars.entrySet().stream().map(el -> el.getValue()).collect(Collectors.toList());
 	}
 
 	public List<Road> getRoads(){

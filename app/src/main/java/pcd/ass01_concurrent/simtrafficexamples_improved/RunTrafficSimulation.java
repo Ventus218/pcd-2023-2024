@@ -12,10 +12,10 @@ public class RunTrafficSimulation {
 
 	public static void main(String[] args) {
 
-		// var simulation = new TrafficSimulationSingleRoadTwoCars();
-		// var simulation = new TrafficSimulationSingleRoadSeveralCars();
-		// var simulation = new TrafficSimulationSingleRoadWithTrafficLightTwoCars();
-		var simulation = new TrafficSimulationWithCrossRoads();
+		// TrafficSimulationSingleRoadTwoCars simulation = new TrafficSimulationSingleRoadTwoCars();
+		// TrafficSimulationSingleRoadSeveralCars simulation = new TrafficSimulationSingleRoadSeveralCars();
+		// TrafficSimulationSingleRoadWithTrafficLightTwoCars simulation = new TrafficSimulationSingleRoadWithTrafficLightTwoCars();
+		TrafficSimulationWithCrossRoads simulation = new TrafficSimulationWithCrossRoads();
 		simulation.setup();
 
 		SimulationEarlyStopper earlyStopper = new SimulationEarlyStopper();

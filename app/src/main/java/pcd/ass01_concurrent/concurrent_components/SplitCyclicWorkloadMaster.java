@@ -40,10 +40,10 @@ public class SplitCyclicWorkloadMaster {
     }
 
     public void workFinished() {
-        for (var worker : splitLoadWorkers) {
+        for (SplitCyclicWorkloadWorker worker : splitLoadWorkers) {
             worker.beginStopping();
         }
-        for (var worker : splitLoadWorkers) {
+        for (SplitCyclicWorkloadWorker worker : splitLoadWorkers) {
             try {
                 worker.join();
             } catch (InterruptedException e) { }

@@ -33,14 +33,14 @@ public class RoadsEnv extends AbstractEnvironment {
 	
 	@Override
 	public void init() {
-		for (var tl: trafficLights) {
+		for (TrafficLight tl: trafficLights) {
 			tl.init();
 		}
 	}
 	
 	@Override
 	public void step(int dt) {
-		for (var tl: trafficLights) {
+		for (TrafficLight tl: trafficLights) {
 			tl.step(dt);
 		}
 	}
@@ -105,7 +105,7 @@ public class RoadsEnv extends AbstractEnvironment {
 	
 	@Override
 	public void processActions() {
-		for (var act: submittedActions()) {
+		for (Action act: submittedActions()) {
 			switch (act) {
 			case MoveForward mv: {
 				CarAgentInfo info = registeredCars.get(mv.agentId());

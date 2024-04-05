@@ -15,7 +15,7 @@ public class SimulationControllerView extends JFrame {
 
     public SimulationControllerView(int defaultStepNumber, SimulationControllerDelegate delegate) {
         super("Simulation Controller View");
-        var thisView = this;
+        SimulationControllerView thisView = this;
         stepNumber = defaultStepNumber;
 
         setSize(280, 120);

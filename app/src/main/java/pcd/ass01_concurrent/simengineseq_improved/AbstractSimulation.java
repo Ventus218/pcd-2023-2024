@@ -86,8 +86,17 @@ public abstract class AbstractSimulation {
 		long timePerStep = 0;
 		int nSteps = 0;
 
-		final SplitCyclicWorkloadMaster master = new SplitCyclicWorkloadMaster(Optional.of(agents.size()), Optional.empty());
+		final SplitCyclicWorkloadMaster master = new SplitCyclicWorkloadMaster(Optional.of(agents.size()),
+				Optional.empty());
 		
+		// These tasks will be executed on every step. (can be instantiated just once here)
+		List<Runnable> tasks = new ArrayList<>();
+		for (AbstractAgent a : agents) {
+			tasks.add(() -> {
+				a.step(dt);
+			});
+		}
+
 		boolean hasStopper = earlyStopper.isPresent();
 		while (nSteps < numSteps && (!hasStopper || !earlyStopper.get().shouldStopSimulation())) {
 			if (pauser.isPresent()) {
@@ -109,12 +118,6 @@ public abstract class AbstractSimulation {
 			env.cleanActions();
 
 			/* ask each agent to make a step */
-			List<Runnable> tasks = new ArrayList<>();
-			for (AbstractAgent a : agents) {
-				tasks.add(() -> {
-					a.step(dt);
-				});
-			}
 			try {
 				master.executeWorkload(tasks);
 			} catch (InterruptedException e) {

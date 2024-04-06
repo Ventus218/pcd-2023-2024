@@ -1,22 +1,22 @@
 package pcd.ass01_concurrent.concurrent_components;
 
-import java.util.Queue;
+import java.util.Optional;
 
 public class SplitCyclicWorkloadWorker extends Thread {
 
-    private Queue<Runnable> tasksQueue;
+    private SynchronizedQueue<Runnable> tasksQueue;
     private SelfResettingBarrier startCycleBarrier;
     private SelfResettingBarrier endCycleBarrier;
     private boolean shouldStop = false;
 
-    public SplitCyclicWorkloadWorker(Queue<Runnable> tasksQueue, SelfResettingBarrier startCycleBarrier, SelfResettingBarrier endCycleBarrier) {
+    public SplitCyclicWorkloadWorker(SynchronizedQueue<Runnable> tasksQueue, SelfResettingBarrier startCycleBarrier, SelfResettingBarrier endCycleBarrier) {
         super();
         this.startCycleBarrier = startCycleBarrier;
         this.tasksQueue = tasksQueue;
         this.endCycleBarrier = endCycleBarrier;
     }
     
-    public SplitCyclicWorkloadWorker(Queue<Runnable> tasksQueue, SelfResettingBarrier startCycleBarrier, SelfResettingBarrier endCycleBarrier, String threadName) {
+    public SplitCyclicWorkloadWorker(SynchronizedQueue<Runnable> tasksQueue, SelfResettingBarrier startCycleBarrier, SelfResettingBarrier endCycleBarrier, String threadName) {
         super(threadName);
         this.startCycleBarrier = startCycleBarrier;
         this.tasksQueue = tasksQueue;
@@ -31,9 +31,9 @@ public class SplitCyclicWorkloadWorker extends Thread {
             try {
                 startCycleBarrier.waitForOthers();
 
-                Runnable task = null;
-                while ((task = tasksQueue.poll()) != null) {
-                    task.run();
+                Optional<Runnable> task = null;
+                while ((task = tasksQueue.dequeue()).isPresent()) {
+                    task.get().run();
                 }
 
                 try {

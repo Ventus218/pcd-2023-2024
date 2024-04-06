@@ -3,11 +3,9 @@ package pcd.ass01_concurrent.concurrent_components;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SplitCyclicWorkloadMaster {
-    private final Queue<Runnable> taskQueue = new ConcurrentLinkedQueue<>();
+    private final SynchronizedQueue<Runnable> taskQueue;
     private final SelfResettingBarrier startCycleBarrier;
     private final SelfResettingBarrier endCycleBarrier;
     private final List<SplitCyclicWorkloadWorker> splitLoadWorkers;
@@ -22,6 +20,7 @@ public class SplitCyclicWorkloadMaster {
             nWorkers = Math.min(processors, expectedNumberOfTasksPerCycle.orElse(processors));
         }
 
+        taskQueue = new SynchronizedQueue<>(expectedNumberOfTasksPerCycle);
         startCycleBarrier = new SelfResettingBarrier(nWorkers + 1); // Master thread will wait at the barrier too
         endCycleBarrier = new SelfResettingBarrier(nWorkers + 1); // Master thread will wait at the barrier too
         splitLoadWorkers = new ArrayList<>();
@@ -34,7 +33,7 @@ public class SplitCyclicWorkloadMaster {
     }
 
     public void executeWorkload(List<Runnable> tasks) throws InterruptedException {
-        taskQueue.addAll(tasks);
+        taskQueue.enqueueAll(tasks);
         startCycleBarrier.waitForOthers();
         endCycleBarrier.waitForOthers();
     }

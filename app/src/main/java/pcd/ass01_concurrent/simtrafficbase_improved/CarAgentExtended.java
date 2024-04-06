@@ -76,7 +76,7 @@ public class CarAgentExtended extends CarAgent {
 			}
 			break;
 		case DECELERATING_BECAUSE_OF_A_NOT_GREEN_SEM:
-			this.currentSpeed -= (deceleration + (random.isPresent() ? random.get().nextDouble(deceleration/10) : 0)) * dt; // MODIFIED HERE
+			this.currentSpeed -= (deceleration + (random.isPresent() ? random.get().nextDouble() * deceleration / 10 : 0)) * dt; // MODIFIED HERE
 			if (this.currentSpeed <= 0) {
 				state =  CarAgentState.WAITING_FOR_GREEN_SEM;
 			} else if (!detectedRedOrOrgangeSemNear()) {

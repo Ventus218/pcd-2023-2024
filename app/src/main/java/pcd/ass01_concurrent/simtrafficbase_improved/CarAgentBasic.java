@@ -66,7 +66,7 @@ public class CarAgentBasic extends CarAgent {
 			} 
 			break;
 		case DECELERATING_BECAUSE_OF_A_CAR:
-			this.currentSpeed -= (deceleration + (random.isPresent() ? random.get().nextDouble(deceleration/10) : 0)) * dt; // MODIFIED HERE
+			this.currentSpeed -= (deceleration + (random.isPresent() ? random.get().nextDouble() * deceleration / 10 : 0)) * dt; // MODIFIED HERE
 			if (this.currentSpeed <= 0) {
 				state =  CarAgentState.STOPPED;
 			} else if (this.carFarEnough()) {

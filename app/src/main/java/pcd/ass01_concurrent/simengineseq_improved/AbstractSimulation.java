@@ -3,6 +3,7 @@ package pcd.ass01_concurrent.simengineseq_improved;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 import pcd.ass01_concurrent.concurrent_components.SimulationEarlyStopper;
 import pcd.ass01_concurrent.concurrent_components.SimulationPauser;
@@ -26,6 +27,8 @@ public abstract class AbstractSimulation {
 	private Optional<SimulationEarlyStopper> earlyStopper = Optional.empty();
 	private Optional<SimulationPauser> pauser = Optional.empty();
 
+	private Optional<Random> random = Optional.empty();
+
 	/* logical time step */
 	private int dt;
 
@@ -48,6 +51,11 @@ public abstract class AbstractSimulation {
 		toBeInSyncWithWallTime = false;
 	}
 
+	protected AbstractSimulation(Optional<Random> random) {
+		this();
+		this.random = random;
+	}
+
 	/**
 	 * 
 	 * Method used to configure the simulation, specifying env and agents
@@ -61,6 +69,17 @@ public abstract class AbstractSimulation {
 
 	public void setPauser(SimulationPauser pauser) {
 		this.pauser = Optional.ofNullable(pauser);
+	}
+
+	/**
+	 * 
+	 * @return An empty optional if the Simulation doesn't accept ranomicity
+	 */
+	protected final Optional<Random> newRandomGenerator() {
+		if (random.isPresent()) {
+			return Optional.of(new Random(random.get().nextLong()));
+		}
+		return Optional.empty();
 	}
 
 	/**

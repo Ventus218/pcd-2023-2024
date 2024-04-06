@@ -1,5 +1,7 @@
 package pcd.ass01_concurrent.simtrafficexamples_improved;
 
+import java.util.Random;
+import java.util.Optional;
 import pcd.ass01_concurrent.simengineseq_improved.*;
 import pcd.ass01_concurrent.simtrafficbase_improved.*;
 
@@ -9,6 +11,11 @@ public class TrafficSimulationSingleRoadMassiveNumberOfCars extends AbstractSimu
 	
 	public TrafficSimulationSingleRoadMassiveNumberOfCars(int numCars) {
 		super();
+		this.numCars = numCars;
+	}
+
+	public TrafficSimulationSingleRoadMassiveNumberOfCars(int numCars, Random random) {
+		super(Optional.ofNullable(random));
 		this.numCars = numCars;
 	}
 	
@@ -33,7 +40,8 @@ public class TrafficSimulationSingleRoadMassiveNumberOfCars extends AbstractSimu
 									initialPos, 
 									carAcceleration, 
 									carDeceleration,
-									carMaxSpeed);
+									carMaxSpeed,
+									newRandomGenerator());
 			this.addAgent(car);
 			
 			/* no sync with wall-time */

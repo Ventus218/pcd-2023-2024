@@ -1,6 +1,7 @@
 package pcd.ass01_concurrent.simtrafficbase_improved;
 
 import java.util.Optional;
+import java.util.Random;
 
 /**
  * 
@@ -30,8 +31,9 @@ public class CarAgentBasic extends CarAgent {
 					double initialPos, 
 					double acc, 
 					double dec,
-					double vmax) {
-		super(id, env, road, initialPos, acc, dec, vmax);
+					double vmax,
+					Optional<Random> random) {
+		super(id, env, road, initialPos, acc, dec, vmax, random);
 		state = CarAgentState.STOPPED;
 	}
 	
@@ -64,7 +66,7 @@ public class CarAgentBasic extends CarAgent {
 			} 
 			break;
 		case DECELERATING_BECAUSE_OF_A_CAR:
-			this.currentSpeed -= deceleration * dt;
+			this.currentSpeed -= (deceleration + (random.isPresent() ? random.get().nextDouble(deceleration/10) : 0)) * dt; // MODIFIED HERE
 			if (this.currentSpeed <= 0) {
 				state =  CarAgentState.STOPPED;
 			} else if (this.carFarEnough()) {

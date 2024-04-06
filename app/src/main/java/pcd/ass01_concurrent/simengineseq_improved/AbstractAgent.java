@@ -1,5 +1,8 @@
 package pcd.ass01_concurrent.simengineseq_improved;
 
+import java.util.Optional;
+import java.util.Random;
+
 /**
  * 
  * Base  class for defining types of agents taking part to the simulation
@@ -9,6 +12,7 @@ public abstract class AbstractAgent {
 	
 	private String myId;
 	private AbstractEnvironment env;
+	protected Optional<Random> random = Optional.empty();
 	
 	/**
 	 * Each agent has an identifier
@@ -17,6 +21,11 @@ public abstract class AbstractAgent {
 	 */
 	protected AbstractAgent(String id) {
 		this.myId = id;
+	}
+
+	protected AbstractAgent(String id, Optional<Random> random) {
+		this(id);
+		this.random = random;
 	}
 	
 	/**

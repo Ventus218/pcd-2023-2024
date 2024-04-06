@@ -1,6 +1,7 @@
 package pcd.ass01_concurrent.simtrafficbase_improved;
 
 import java.util.Optional;
+import java.util.Random;
 
 import pcd.ass01_concurrent.simengineseq_improved.*;
 
@@ -26,8 +27,9 @@ public abstract class CarAgent extends AbstractAgent {
 			double initialPos, 
 			double acc, 
 			double dec,
-			double vmax) {
-		super(id);
+			double vmax,
+			Optional<Random> random) {
+		super(id, random);
 		this.acceleration = acc;
 		this.deceleration = dec;
 		this.maxSpeed = vmax;

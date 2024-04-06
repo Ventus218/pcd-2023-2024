@@ -1,7 +1,5 @@
 package pcd.ass01_concurrent.simtrafficexamples_improved;
 
-import java.util.Random;
-import java.util.Optional;
 import pcd.ass01_concurrent.simengineseq_improved.*;
 import pcd.ass01_concurrent.simtrafficbase_improved.*;
 
@@ -12,8 +10,6 @@ public class TrafficSimulationWithCrossRoads extends AbstractSimulation {
 	}
 	
 	public void setup() {
-
-		Random  gen = new Random(1);
 
 		this.setupTimings(0, 1);
 		
